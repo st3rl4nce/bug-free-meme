@@ -1,11 +1,15 @@
 import React, { useState, useEffect } from "react";
 import productData from "./products.json";
 import ProductCard from "./ProductCard";
+import FrequentlyBoughtTogetherCard from './FrequentlyBoughtTogetherCard';
 import "./App.css";
 
 // Sample product data
 const products = productData;
-
+const productPriceMap = {};
+products.forEach(product => {
+  productPriceMap[product.name] = product.price;
+});
 function App() {
   const [cart, setCart] = useState([]);
   const [frequentlyBoughtTogether, setFrequentlyBoughtTogether] = useState([]);
@@ -17,6 +21,7 @@ function App() {
         item.id === product.id ? { ...item, quantity: item.quantity + quantity } : item
       );
       setCart(updatedCart);
+      // console.log(cart);
       fetchFrequentlyBoughtTogether(updatedCart);
     } else {
       const newCart = [...cart, { ...product, quantity }];
@@ -24,23 +29,27 @@ function App() {
       fetchFrequentlyBoughtTogether(newCart);
     }
   };
+  // useEffect(() => {
+  //   console.log(frequentlyBoughtTogether);
+  // }, [frequentlyBoughtTogether]);
 
   const fetchFrequentlyBoughtTogether = async (cart) => {
     try {
-      const uniqueItems = Array.from(new Set(cart.map(item => item.id)));
-      const response = await fetch('https://tyt2ponrb7itwx2ncuc47qzjy40nskyw.lambda-url.eu-north-1.on.aws/recommend', {
+      const uniqueItems = Array.from(new Set(cart.map(item => item.name)));
+      console.log(JSON.stringify({ cart_data: uniqueItems }));
+      const response = await fetch('http://localhost:3000/recommend', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*', // Required for CORS support to work
-          'Access-Control-Allow-Credentials': true,
         },
-        body: JSON.stringify({ items: uniqueItems }),
+        body: JSON.stringify({ cart_data: uniqueItems }),
       });
 
       if (response.ok) {
-        const data = await response.json();
-        setFrequentlyBoughtTogether(data);
+        const data = JSON.parse(await response.json());
+        // console.log(typeof data);
+        setFrequentlyBoughtTogether(data["recommendations"]);
+        // console.log(frequentlyBoughtTogether);
       } else {
         throw new Error('Failed to fetch frequently bought together data');
       }
@@ -49,9 +58,9 @@ function App() {
     }
   };
 
-  useEffect((cart) => {
+  useEffect(() => {
     fetchFrequentlyBoughtTogether(cart);
-  }, []);
+  }, [cart]);
 
   return (
     <div className="App">
@@ -68,28 +77,31 @@ function App() {
       </header>
 
       <div className="main-content">
-      <div className="product-list">
-      {products.map((product) => (
-        <ProductCard
-          key={product.id}
-          product={product}
-          handleAddToCart={handleAddToCart}
-          cart={cart}
-          setCart={setCart}
-          fetchFrequentlyBoughtTogether={fetchFrequentlyBoughtTogether}
-        />
-      ))}
-    </div>
+        <div className="product-list">
+          {products.map((product) => (
+            <ProductCard
+              key={product.id}
+              product={product}
+              handleAddToCart={handleAddToCart}
+              cart={cart}
+              setCart={setCart}
+              fetchFrequentlyBoughtTogether={fetchFrequentlyBoughtTogether}
+            />
+          ))}
+        </div>
 
         <div className="sidebar">
           <h2>Frequently Bought Together</h2>
           {frequentlyBoughtTogether.length > 0 ? (
-            frequentlyBoughtTogether.map((item) => (
-              <div key={item.id} className="frequent-item">
-                <h3>{item.name}</h3>
-                <p>Price: ${item.price}</p>
-              </div>
-            ))
+            <div className="frequent-items-list">
+              {frequentlyBoughtTogether.map((item) => (
+                <FrequentlyBoughtTogetherCard
+                  item={item}
+                  price={productPriceMap[item]}
+                  handleAddToCart={handleAddToCart}
+                />
+              ))}
+            </div>
           ) : (
             <p>No frequently bought together items found.</p>
           )}

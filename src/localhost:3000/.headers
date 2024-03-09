@@ -1,0 +1,11 @@
+[
+  {
+    "applyTo": "recommend",
+    "headers": [
+      {
+        "name": "header-name-1",
+        "value": "header value"
+      }
+    ]
+  }
+]

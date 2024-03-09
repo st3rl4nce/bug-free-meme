@@ -1,26 +1,26 @@
 import React, { useState } from 'react';
 
-const ProductCard = ({ product, handleAddToCart }) => {
+const FrequentlyBoughtTogetherCard = ({ item, handleAddToCart }) => {
   const [quantity, setQuantity] = useState(0);
 
   const handleUpdateQuantity = (action) => {
     if (action === 'increment') {
       setQuantity(quantity + 1);
-    } else if(quantity > 0){
-      setQuantity(quantity-1);
+    } else if (quantity > 0) {
+      setQuantity(quantity - 1);
     }
   };
 
   const addToCart = () => {
-    handleAddToCart(product, quantity + 1);
+    handleAddToCart(item, quantity + 1);
     setQuantity(quantity + 1);
   };
 
   return (
-    <div className="product-card">
+    <div className="frequent-item-card">
       <div className="card-content">
-        <h3>{product.name}</h3>
-        <p>Price: ${product.price}</p>
+        <h3>{item}</h3>
+        <p>Price: ${item.price}</p>
         {quantity > 0 ? (
           <div className="quantity-counter">
             <button onClick={() => handleUpdateQuantity('decrement')}>-</button>
@@ -35,4 +35,4 @@ const ProductCard = ({ product, handleAddToCart }) => {
   );
 };
 
-export default ProductCard;
+export default FrequentlyBoughtTogetherCard;
