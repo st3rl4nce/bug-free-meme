@@ -1,13 +1,16 @@
 import React, { useState } from 'react';
 
-const FrequentlyBoughtTogetherCard = ({ item, handleAddToCart }) => {
+const FrequentlyBoughtTogetherCard = ({ item, handleAddToCart, handleRemoveFromCart}) => {
   const [quantity, setQuantity] = useState(0);
 
   const handleUpdateQuantity = (action) => {
     if (action === 'increment') {
       setQuantity(quantity + 1);
-    } else if (quantity > 0) {
+    } else if (quantity > 1) {
       setQuantity(quantity - 1);
+    } else {
+      setQuantity(0);
+      handleRemoveFromCart(item);
     }
   };
 

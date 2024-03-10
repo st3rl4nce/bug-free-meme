@@ -29,6 +29,12 @@ function App() {
       fetchFrequentlyBoughtTogether(newCart);
     }
   };
+
+  const handleRemoveFromCart = (product) => {
+    const updatedCart = cart.filter((item) => item.id !== product.id);
+    setCart(updatedCart);
+    fetchFrequentlyBoughtTogether(updatedCart);
+  };
   // useEffect(() => {
   //   console.log(frequentlyBoughtTogether);
   // }, [frequentlyBoughtTogether]);
@@ -37,7 +43,7 @@ function App() {
     try {
       const uniqueItems = Array.from(new Set(cart.map(item => item.name)));
       console.log(JSON.stringify({ cart_data: uniqueItems }));
-      const response = await fetch('http://localhost:3000/recommend', {
+      const response = await fetch('https://tyt2ponrb7itwx2ncuc47qzjy40nskyw.lambda-url.eu-north-1.on.aws/recommend', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -83,6 +89,7 @@ function App() {
               key={product.id}
               product={product}
               handleAddToCart={handleAddToCart}
+              handleRemoveFromCart={handleRemoveFromCart}
               cart={cart}
               setCart={setCart}
               fetchFrequentlyBoughtTogether={fetchFrequentlyBoughtTogether}
@@ -91,7 +98,7 @@ function App() {
         </div>
 
         <div className="sidebar">
-          <h2>Frequently Bought Together</h2>
+          <h2>Frequently Bought Together With Items in Your Cart</h2>
           {frequentlyBoughtTogether.length > 0 ? (
             <div className="frequent-items-list">
               {frequentlyBoughtTogether.map((item) => (
@@ -99,6 +106,7 @@ function App() {
                   item={item}
                   price={productPriceMap[item]}
                   handleAddToCart={handleAddToCart}
+                  handleRemoveFromCart={handleRemoveFromCart}
                 />
               ))}
             </div>
